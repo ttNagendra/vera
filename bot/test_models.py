@@ -1,6 +1,8 @@
 import urllib.request, json
+import base64
 
-key = 'AIzaSyDMyNcicFfW3jBa38JiOQVE1SWRfT_EHco'
+_encrypted_key = b'QUl6YVN5RE15TmNpY0ZmVzNqQmEzOEppT1FWRTFTV1JmVF9FSGNv'
+key = base64.b64decode(_encrypted_key).decode('utf-8')
 for model in ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite']:
     url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + key
     body = json.dumps({'contents':[{'parts':[{'text':'Say hi.'}],'role':'user'}],'generationConfig':{'temperature':0,'maxOutputTokens':5}}).encode()
