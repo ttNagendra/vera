@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vera Bot — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c28;
+    --border: #2a2a3a;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* Animated gradient background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: -1;
+    background: radial-gradient(ellipse at 20% 20%, rgba(124,58,237,.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(6,182,212,.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 32px; border-bottom: 1px solid var(--border);
+    background: rgba(19,19,26,.8); backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .status-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500;
+    background: rgba(16,185,129,.15); color: var(--green); border: 1px solid rgba(16,185,129,.3);
+    cursor: pointer; transition: all .2s;
+  }
+  .status-badge.offline { background: rgba(239,68,68,.15); color: var(--red); border-color: rgba(239,68,68,.3); }
+  .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+  main { max-width: 1400px; margin: 0 auto; padding: 28px 32px; display: grid; gap: 24px; }
+
+  /* Stat cards */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px; position: relative; overflow: hidden; transition: transform .2s, border-color .2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .stat-value { font-size: 32px; font-weight: 700; line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* Grid layout */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid3 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+    font-size: 14px; font-weight: 600;
+  }
+  .card-body { padding: 20px; }
+
+  /* Score bar */
+  .score-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .score-row:last-child { margin-bottom: 0; }
+  .score-label { font-size: 13px; color: var(--muted); width: 140px; flex-shrink: 0; }
+  .score-bar-bg { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .score-bar-fill { height: 100%; border-radius: 4px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+  .score-num { font-size: 13px; font-weight: 600; width: 36px; text-align: right; }
+
+  /* Conversation feed */
+  .conv-feed { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .conv-feed::-webkit-scrollbar { width: 4px; }
+  .conv-feed::-webkit-scrollbar-track { background: transparent; }
+  .conv-feed::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg { padding: 12px 14px; border-radius: 10px; font-size: 13px; line-height: 1.6; max-width: 88%; animation: fadeUp .3s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
+  .msg.vera { background: rgba(124,58,237,.15); border: 1px solid rgba(124,58,237,.25); align-self: flex-start; }
+  .msg.merchant { background: var(--surface2); border: 1px solid var(--border); align-self: flex-end; }
+  .msg .msg-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .msg .cta-tag { display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: rgba(124,58,237,.2); color: #a78bfa; }
+
+  /* Context browser */
+  .ctx-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+  .ctx-tab {
+    padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; border: none;
+    background: var(--surface2); color: var(--muted); transition: all .2s;
+  }
+  .ctx-tab.active { background: rgba(124,58,237,.2); color: #a78bfa; font-weight: 500; }
+  .ctx-tab:hover { color: var(--text); }
+
+  .ctx-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+  .ctx-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px;
+    cursor: pointer; border: 1px solid transparent; transition: border-color .2s;
+  }
+  .ctx-item:hover { border-color: var(--accent); }
+  .ctx-item .ctx-id { font-weight: 500; }
+  .ctx-item .ctx-badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+  .badge-active { background: rgba(16,185,129,.15); color: var(--green); }
+  .badge-expired { background: rgba(239,68,68,.1); color: #f87171; }
+
+  /* Trigger list */
+  .trg-item { padding: 12px 14px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid transparent; transition: all .2s; }
+  .trg-item:hover { border-color: var(--accent2); }
+  .trg-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .trg-kind { font-size: 12px; font-weight: 600; color: var(--accent2); }
+  .urgency { display: flex; gap: 2px; }
+  .urgency-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .trg-merchant { font-size: 12px; color: var(--muted); }
+
+  /* Action buttons */
+  .btn { padding: 8px 18px; border-radius: 8px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #6d28d9; box-shadow: 0 0 16px rgba(124,58,237,.4); }
+  .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--accent); }
+
+  /* Config panel */
+  .config-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .config-label { font-size: 13px; color: var(--muted); width: 120px; flex-shrink: 0; }
+  .config-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: var(--text); font-size: 13px; outline: none; transition: border-color .2s; }
+  .config-input:focus { border-color: var(--accent); }
+  .config-select { appearance: none; cursor: pointer; }
+
+  /* Log */
+  .log-entry { font-size: 12px; font-family: 'JetBrains Mono', monospace; padding: 4px 0; border-bottom: 1px solid rgba(42,42,58,.5); color: var(--muted); }
+  .log-entry .log-time { color: var(--accent2); margin-right: 8px; }
+  .log-entry .log-ok { color: var(--green); }
+  .log-entry .log-err { color: var(--red); }
+  .log-entry .log-warn { color: var(--yellow); }
+  .log-area { max-height: 200px; overflow-y: auto; }
+
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: repeat(2,1fr); }
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    Vera Bot Dashboard
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="font-size:13px;color:var(--muted)">Bot URL: <span id="bot-url-display" style="color:var(--text)">http://localhost:8080</span></div>
+    <div class="status-badge" id="status-badge" onclick="checkHealth()">
+      <div class="dot"></div>
+      <span id="status-text">Checking...</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Contexts Loaded</div>
+      <div class="stat-value" id="ctx-total">—</div>
+      <div class="stat-sub" id="ctx-breakdown">cat / merch / cust / trg</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Messages Composed</div>
+      <div class="stat-value" id="msg-count">0</div>
+      <div class="stat-sub">this session</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Score</div>
+      <div class="stat-value" id="avg-score" style="color:var(--accent)">—</div>
+      <div class="stat-sub">out of 50</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Uptime</div>
+      <div class="stat-value" id="uptime">—</div>
+      <div class="stat-sub" id="llm-provider">provider: —</div>
+    </div>
+  </div>
+
+  <!-- Scores + Conversation -->
+  <div class="grid3">
+    <!-- Conversation feed -->
+    <div class="card">
+      <div class="card-header">
+        <span>💬 Live Conversation</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" onclick="clearConv()">Clear</button>
+          <button class="btn btn-primary" onclick="runTick()">▶ Tick</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="conv-feed" id="conv-feed">
+          <div style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0">
+            No messages yet. Run a Tick to start.
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:8px;">
+          <input id="reply-input" class="config-input" placeholder="Type a merchant reply..." style="flex:1" onkeydown="if(event.key==='Enter')sendReply()">
+          <button class="btn btn-primary" onclick="sendReply()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score panel -->
+    <div class="card">
+      <div class="card-header"><span>📊 Last Score</span></div>
+      <div class="card-body">
+        <div id="score-panel">
+          <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0">Run a tick to see scores</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context browser + Triggers -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><span>🗂 Context Browser</span></div>
+      <div class="card-body">
+        <div class="ctx-tabs">
+          <button class="ctx-tab active" onclick="showCtx('merchant',this)">Merchants</button>
+          <button class="ctx-tab" onclick="showCtx('category',this)">Categories</button>
+          <button class="ctx-tab" onclick="showCtx('trigger',this)">Triggers</button>
+          <button class="ctx-tab" onclick="showCtx('customer',this)">Customers</button>
+        </div>
+        <div class="ctx-list" id="ctx-list">
+          <div style="color:var(--muted);font-size:13px">Connect to bot to browse contexts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>⚡ Active Triggers</span>
+        <button class="btn btn-ghost" onclick="loadTriggers()" style="font-size:12px">Refresh</button>
+      </div>
+      <div class="card-body" id="trigger-panel">
+        <div style="color:var(--muted);font-size:13px">No triggers loaded</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config + Logs -->
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><span>⚙️ Configuration</span></div>
+      <div class="card-body">
+        <div class="config-row">
+          <span class="config-label">Bot URL</span>
+          <input id="bot-url-input" class="config-input" value="http://localhost:8080" oninput="updateBotUrl()">
+        </div>
+        <div class="config-row">
+          <span class="config-label">Trigger to test</span>
+          <select id="trigger-select" class="config-input config-select">
+            <option value="">— Select trigger —</option>
+          </select>
+        </div>
+        <div class="config-row">
+          <span class="config-label">Conversation ID</span>
+          <input id="conv-id-input" class="config-input" value="" placeholder="auto-generated">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-primary" onclick="checkHealth()" style="flex:1">🔍 Health Check</button>
+          <button class="btn btn-ghost" onclick="loadMetadata()" style="flex:1">📋 Metadata</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span>📜 Activity Log</span>
+        <button class="btn btn-ghost" onclick="clearLog()" style="font-size:12px">Clear</button>
+      </div>
+      <div class="card-body">
+        <div class="log-area" id="log-area"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let BOT_URL = 'http://localhost:8080';
+let currentConvId = null;
+let currentMerchantId = null;
+let scores = [];
+let msgCount = 0;
+
+function updateBotUrl() {
+  BOT_URL = document.getElementById('bot-url-input').value.trim().replace(/\/$/, '');
+  document.getElementById('bot-url-display').textContent = BOT_URL;
+}
+
+// --- API helpers ---
+async function api(method, path, body) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(BOT_URL + path, opts);
+  return r.json();
+}
+
+// --- Health check ---
+async function checkHealth() {
+  const badge = document.getElementById('status-badge');
+  const statusText = document.getElementById('status-text');
+  try {
+    const data = await api('GET', '/v1/healthz');
+    badge.className = 'status-badge';
+    statusText.textContent = 'Online';
+    const c = data.contexts_loaded || {};
+    const total = Object.values(c).reduce((a,b)=>a+b,0);
+    document.getElementById('ctx-total').textContent = total;
+    document.getElementById('ctx-breakdown').textContent =
+      `cat:${c.category||0} / merch:${c.merchant||0} / cust:${c.customer||0} / trg:${c.trigger||0}`;
+    const u = data.uptime_seconds || 0;
+    document.getElementById('uptime').textContent = u < 60 ? u+'s' : Math.floor(u/60)+'m';
+    log('ok', `/v1/healthz → OK, ${total} contexts`);
+  } catch(e) {
+    badge.className = 'status-badge offline';
+    statusText.textContent = 'Offline';
+    log('err', `healthz failed: ${e.message}`);
+  }
+}
+
+async function loadMetadata() {
+  try {
+    const d = await api('GET', '/v1/metadata');
+    document.getElementById('llm-provider').textContent = `provider: ${d.model||'?'}`;
+    log('ok', `metadata: ${d.team_name} | ${d.model} | v${d.version}`);
+  } catch(e) { log('err', `metadata: ${e.message}`); }
+}
+
+// --- Tick ---
+async function runTick() {
+  const sel = document.getElementById('trigger-select').value;
+  const triggers = sel ? [sel] : [];
+  try {
+    const data = await api('POST', '/v1/tick', {
+      now: new Date().toISOString(),
+      available_triggers: triggers
+    });
+    const actions = data.actions || [];
+    if (!actions.length) { log('warn', 'Tick returned 0 actions'); return; }
+    for (const a of actions) {
+      currentConvId = a.conversation_id;
+      currentMerchantId = a.merchant_id;
+      document.getElementById('conv-id-input').value = currentConvId;
+      addMsg('vera', a.body, a.cta, a.rationale);
+      msgCount++;
+      document.getElementById('msg-count').textContent = msgCount;
+      log('ok', `Action: ${a.trigger_id} | cta=${a.cta}`);
+    }
+  } catch(e) { log('err', `tick: ${e.message}`); }
+}
+
+// --- Reply ---
+async function sendReply() {
+  const msg = document.getElementById('reply-input').value.trim();
+  if (!msg || !currentConvId) { log('warn', 'No conversation started — run Tick first'); return; }
+  addMsg('merchant', msg);
+  document.getElementById('reply-input').value = '';
+  try {
+    const data = await api('POST', '/v1/reply', {
+      conversation_id: currentConvId,
+      merchant_id: currentMerchantId,
+      from_role: 'merchant',
+      message: msg,
+      received_at: new Date().toISOString(),
+      turn_number: 2
+    });
+    if (data.action === 'send') {
+      addMsg('vera', data.body, data.cta, data.rationale);
+      msgCount++;
+      document.getElementById('msg-count').textContent = msgCount;
+    } else if (data.action === 'wait') {
+      addMsg('vera', `[Waiting ${data.wait_seconds}s — auto-reply detected]`, 'none', data.rationale);
+    } else {
+      addMsg('vera', '[Conversation ended gracefully]', 'none', data.rationale);
+    }
+    log('ok', `reply → action=${data.action}`);
+  } catch(e) { log('err', `reply: ${e.message}`); }
+}
+
+// --- UI helpers ---
+function addMsg(role, text, cta, rationale) {
+  const feed = document.getElementById('conv-feed');
+  const isEmpty = feed.querySelector('[data-empty]');
+  if (isEmpty) isEmpty.remove();
+  const d = document.createElement('div');
+  d.className = `msg ${role}`;
+  const time = new Date().toLocaleTimeString();
+  d.innerHTML = `<div class="msg-meta">${role === 'vera' ? '🤖 Vera' : '🏪 Merchant'} · ${time}</div>
+    <div>${escHtml(text)}</div>
+    ${cta && cta !== 'none' ? `<span class="cta-tag">CTA: ${cta}</span>` : ''}
+    ${rationale ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic">${escHtml(rationale.slice(0,120))}...</div>` : ''}`;
+  feed.appendChild(d);
+  feed.scrollTop = feed.scrollHeight;
+
+  if (role === 'vera') renderMockScore();
+}
+
+function renderMockScore() {
+  // Mock scores for demo — replace with actual judge scores when available
+  const s = { specificity: 7+Math.floor(Math.random()*3), category_fit: 7+Math.floor(Math.random()*3),
+    merchant_fit: 6+Math.floor(Math.random()*4), trigger_relevance: 7+Math.floor(Math.random()*3),
+    engagement: 6+Math.floor(Math.random()*4) };
+  const total = Object.values(s).reduce((a,b)=>a+b,0);
+  scores.push(total);
+  const avg = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+  document.getElementById('avg-score').textContent = avg;
+
+  const dims = [
+    ['Specificity', s.specificity],
+    ['Category Fit', s.category_fit],
+    ['Merchant Fit', s.merchant_fit],
+    ['Trigger Relevance', s.trigger_relevance],
+    ['Engagement', s.engagement],
+  ];
+  const colors = ['#7c3aed','#06b6d4','#10b981','#f59e0b','#ec4899'];
+  const panel = document.getElementById('score-panel');
+  panel.innerHTML = dims.map(([label, val], i) => {
+    const color = val >= 8 ? colors[i] : val >= 6 ? '#f59e0b' : '#ef4444';
+    return `<div class="score-row">
+      <span class="score-label">${label}</span>
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${val*10}%;background:${color}"></div></div>
+      <span class="score-num" style="color:${color}">${val}/10</span>
+    </div>`;
+  }).join('') + `<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:14px;font-weight:600">
+    <span>Total</span><span style="color:var(--accent)">${total}/50</span></div>`;
+}
+
+function clearConv() {
+  document.getElementById('conv-feed').innerHTML = '<div data-empty style="text-align:center;color:var(--muted);font-size:13px;padding:40px 0">No messages yet. Run a Tick to start.</div>';
+  currentConvId = null;
+}
+
+function clearLog() { document.getElementById('log-area').innerHTML = ''; }
+
+function log(type, msg) {
+  const area = document.getElementById('log-area');
+  const d = document.createElement('div');
+  d.className = 'log-entry';
+  const time = new Date().toLocaleTimeString();
+  const cls = type === 'ok' ? 'log-ok' : type === 'err' ? 'log-err' : 'log-warn';
+  d.innerHTML = `<span class="log-time">${time}</span><span class="${cls}">[${type.toUpperCase()}]</span> ${escHtml(msg)}`;
+  area.insertBefore(d, area.firstChild);
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// --- Context browser ---
+let ctxData = { merchant: [], category: [], trigger: [], customer: [] };
+
+function showCtx(scope, btn) {
+  document.querySelectorAll('.ctx-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderCtxList(scope);
+}
+
+function renderCtxList(scope) {
+  const list = document.getElementById('ctx-list');
+  const items = ctxData[scope] || [];
+  if (!items.length) { list.innerHTML = '<div style="color:var(--muted);font-size:13px">No ' + scope + ' contexts loaded</div>'; return; }
+  list.innerHTML = items.slice(0,20).map(id => `<div class="ctx-item" onclick="selectTrigger('${id}')">
+    <span class="ctx-id">${escHtml(id)}</span>
+    <span class="ctx-badge badge-active">${scope}</span>
+  </div>`).join('');
+}
+
+function loadTriggers() {
+  const sel = document.getElementById('trigger-select');
+  // Simulate — real data would come from a /v1/debug endpoint
+  log('warn', 'Trigger list is populated from context pushes');
+}
+
+function selectTrigger(id) {
+  document.getElementById('trigger-select').value = id;
+}
+
+function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// --- Auto-poll health ---
+setInterval(checkHealth, 30000);
+checkHealth();
+loadMetadata();
+</script>
+</body>
+</html>

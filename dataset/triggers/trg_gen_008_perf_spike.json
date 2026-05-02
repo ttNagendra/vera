@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_008_perf_spike",
+  "scope": "merchant",
+  "kind": "perf_spike",
+  "source": "internal",
+  "merchant_id": "m_009_apollo_pharmacy_jaipur",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_009_apollo_pharmacy_jaipur"
+  },
+  "urgency": 4,
+  "suppression_key": "perf_spike:m_009_apollo_pharmacy_jaipur:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_009_milestone_reached",
+  "scope": "merchant",
+  "kind": "milestone_reached",
+  "source": "internal",
+  "merchant_id": "m_010_sunrisepharm_pharmacy_lucknow",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_010_sunrisepharm_pharmacy_lucknow"
+  },
+  "urgency": 5,
+  "suppression_key": "milestone_reached:m_010_sunrisepharm_pharmacy_lucknow:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_001_curious_ask_due",
+  "scope": "merchant",
+  "kind": "curious_ask_due",
+  "source": "internal",
+  "merchant_id": "m_002_bharat_dentist_mumbai",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_002_bharat_dentist_mumbai"
+  },
+  "urgency": 2,
+  "suppression_key": "curious_ask_due:m_002_bharat_dentist_mumbai:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

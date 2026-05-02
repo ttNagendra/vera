@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_014_milestone_reached",
+  "scope": "merchant",
+  "kind": "milestone_reached",
+  "source": "internal",
+  "merchant_id": "m_002_bharat_dentist_mumbai_b",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_002_bharat_dentist_mumbai_b"
+  },
+  "urgency": 5,
+  "suppression_key": "milestone_reached:m_002_bharat_dentist_mumbai_b:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

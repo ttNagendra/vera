@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_011_curious_ask_due",
+  "scope": "merchant",
+  "kind": "curious_ask_due",
+  "source": "internal",
+  "merchant_id": "m_001_drmeera_dentist_delhi_c",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_001_drmeera_dentist_delhi_c"
+  },
+  "urgency": 2,
+  "suppression_key": "curious_ask_due:m_001_drmeera_dentist_delhi_c:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

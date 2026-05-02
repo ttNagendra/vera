@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_012_gbp_unverified",
+  "scope": "merchant",
+  "kind": "gbp_unverified",
+  "source": "internal",
+  "merchant_id": "m_001_drmeera_dentist_delhi_d",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_001_drmeera_dentist_delhi_d"
+  },
+  "urgency": 3,
+  "suppression_key": "gbp_unverified:m_001_drmeera_dentist_delhi_d:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

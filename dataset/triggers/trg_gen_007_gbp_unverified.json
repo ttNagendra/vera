@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_007_gbp_unverified",
+  "scope": "merchant",
+  "kind": "gbp_unverified",
+  "source": "internal",
+  "merchant_id": "m_008_zenyoga_gym_chennai",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_008_zenyoga_gym_chennai"
+  },
+  "urgency": 3,
+  "suppression_key": "gbp_unverified:m_008_zenyoga_gym_chennai:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

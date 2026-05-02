@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_002_gbp_unverified",
+  "scope": "merchant",
+  "kind": "gbp_unverified",
+  "source": "internal",
+  "merchant_id": "m_003_studio11_salon_hyderabad",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_003_studio11_salon_hyderabad"
+  },
+  "urgency": 3,
+  "suppression_key": "gbp_unverified:m_003_studio11_salon_hyderabad:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}

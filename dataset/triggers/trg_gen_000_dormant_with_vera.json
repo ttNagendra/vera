@@ -1,0 +1,14 @@
+{
+  "id": "trg_gen_000_dormant_with_vera",
+  "scope": "merchant",
+  "kind": "dormant_with_vera",
+  "source": "internal",
+  "merchant_id": "m_001_drmeera_dentist_delhi",
+  "customer_id": null,
+  "payload": {
+    "merchant_id": "m_001_drmeera_dentist_delhi"
+  },
+  "urgency": 1,
+  "suppression_key": "dormant_with_vera:m_001_drmeera_dentist_delhi:2026",
+  "expires_at": "2026-06-30T00:00:00Z"
+}
