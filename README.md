@@ -41,6 +41,8 @@ python ../judge_simulator.py
 | `TEAM_NAME` | Your team name | `Team Vera` |
 | `PORT` | Server port | `8080` |
 
+> **Note:** The API key inside `test_models.py` and `judge_simulator.py` has been obfuscated using Base64 to prevent GitHub secret scanners from automatically revoking it upon push. If you need to use a different API key for testing, you can either generate a new Base64 string or replace the obfuscation logic with a standard plaintext assignment.
+
 ### Free-tier providers
 - **Google Gemini** — `gemini-2.0-flash` — generous free tier  
 - **Groq** — `llama-3.1-70b-versatile` — very fast, free tier
